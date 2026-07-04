@@ -36,12 +36,37 @@ fn run() -> Result<()> {
         }
         Some("optimize") => cmd_optimize(&args[1..]),
         Some("calibrate") => cmd_calibrate(&args[1..]),
+        Some("windows") => cmd_list_windows(),
         Some("--gui") | Some("gui") => launch_gui(),
         _ => {
             print_usage();
             Ok(())
         }
     }
+}
+
+fn cmd_list_windows() -> Result<()> {
+    let windows = tethys_scanner::capture::list_windows()?;
+    if windows.is_empty() {
+        println!("No windows enumerated. Try running this terminal as Administrator.");
+        return Ok(());
+    }
+    println!("Enumerable windows ({}):", windows.len());
+    for (title, minimized) in &windows {
+        let flag = if *minimized { "min " } else { "show" };
+        let shown = if title.is_empty() {
+            "<no title>"
+        } else {
+            title.as_str()
+        };
+        println!("  [{flag}] {shown}");
+    }
+    println!(
+        "\nFind the Wuthering Waves entry above. If its title differs from\n\
+         \"Wuthering Waves\", update GAME_WINDOW_TITLE in crates/scanner/src/capture.rs\n\
+         to a lowercase substring of the real title."
+    );
+    Ok(())
 }
 
 fn cmd_calibrate(args: &[String]) -> Result<()> {
@@ -219,7 +244,8 @@ fn print_usage() {
          USAGE:\n\
          \x20 tethys sample                       print a sample inventory (JSON schema)\n\
          \x20 tethys optimize <inv.json> [flags]  optimize a build\n\
-         \x20 tethys calibrate [out.png] [--grid]  save a capture-region overlay (needs `capture`)\n\n\
+         \x20 tethys calibrate [out.png] [--grid]  save a capture-region overlay (needs `capture`)\n\
+         \x20 tethys windows                        list window titles for scan setup (needs `capture`)\n\n\
          OPTIMIZE FLAGS:\n\
          \x20 --profile <dps|support>   weighting to optimize for (default: dps)\n\
          \x20 --set <SetName>           require a five-piece of this set\n\
