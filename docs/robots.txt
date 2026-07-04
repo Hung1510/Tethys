@@ -2,4 +2,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hung1510.github.io/tethys/sitemap.xml
+Sitemap: https://tethys-gray.vercel.app/sitemap.xml
