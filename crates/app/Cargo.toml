@@ -1,0 +1,30 @@
+[package]
+name = "tethys-app"
+description = "Tethys — Wuthering Waves echo optimizer. CLI by default; desktop GUI behind the `gui` feature."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[[bin]]
+name = "tethys"
+path = "src/main.rs"
+
+[dependencies]
+tethys-core = { path = "../core" }
+tethys-scanner = { path = "../scanner" }
+serde_json = { workspace = true }
+anyhow = { workspace = true }
+
+# Desktop GUI. Optional so the default build (and CI) stays lightweight and
+# free of a windowing/GL system-dependency chain.
+eframe = { version = "0.27", optional = true, default-features = true }
+
+[features]
+default = []
+gui = ["dep:eframe"]
+# Forward the scanner's platform features so the whole app can be built with
+# real capture / OCR, e.g. `cargo run -p tethys-app --features capture`.
+capture = ["tethys-scanner/capture"]
+tesseract = ["tethys-scanner/tesseract"]

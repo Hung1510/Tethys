@@ -1,0 +1,207 @@
+{
+  "echoes": [
+    {
+      "id": 1,
+      "name": "Lampylumen Myriad",
+      "set": "SunSinkingEclipse",
+      "cost": 4,
+      "level": 25,
+      "main_stat": {
+        "stat": "CritDmg",
+        "value": 44.0
+      },
+      "substats": [
+        {
+          "stat": "CritRate",
+          "value": 9.0
+        },
+        {
+          "stat": "AtkPct",
+          "value": 8.6
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Mourning Aix",
+      "set": "SunSinkingEclipse",
+      "cost": 4,
+      "level": 25,
+      "main_stat": {
+        "stat": "CritRate",
+        "value": 22.0
+      },
+      "substats": [
+        {
+          "stat": "CritDmg",
+          "value": 15.0
+        },
+        {
+          "stat": "Atk",
+          "value": 40.0
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Inferno Rider",
+      "set": "MoltenRiftEmbers",
+      "cost": 4,
+      "level": 25,
+      "main_stat": {
+        "stat": "AtkPct",
+        "value": 33.0
+      },
+      "substats": [
+        {
+          "stat": "CritRate",
+          "value": 6.3
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Hoochief",
+      "set": "SunSinkingEclipse",
+      "cost": 3,
+      "level": 25,
+      "main_stat": {
+        "stat": "Fusion",
+        "value": 30.0
+      },
+      "substats": [
+        {
+          "stat": "CritRate",
+          "value": 10.5
+        },
+        {
+          "stat": "CritDmg",
+          "value": 21.0
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "name": "Tambourinist",
+      "set": "SunSinkingEclipse",
+      "cost": 3,
+      "level": 25,
+      "main_stat": {
+        "stat": "AtkPct",
+        "value": 30.0
+      },
+      "substats": [
+        {
+          "stat": "CritDmg",
+          "value": 14.7
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "name": "Fusion Warrior",
+      "set": "SunSinkingEclipse",
+      "cost": 3,
+      "level": 25,
+      "main_stat": {
+        "stat": "Fusion",
+        "value": 30.0
+      },
+      "substats": [
+        {
+          "stat": "AtkPct",
+          "value": 9.4
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "name": "Lava Larva",
+      "set": "MoltenRiftEmbers",
+      "cost": 3,
+      "level": 25,
+      "main_stat": {
+        "stat": "Fusion",
+        "value": 30.0
+      },
+      "substats": [
+        {
+          "stat": "CritRate",
+          "value": 5.1
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "name": "Fission Junrock",
+      "set": "SunSinkingEclipse",
+      "cost": 1,
+      "level": 25,
+      "main_stat": {
+        "stat": "AtkPct",
+        "value": 18.0
+      },
+      "substats": [
+        {
+          "stat": "CritRate",
+          "value": 9.0
+        },
+        {
+          "stat": "CritDmg",
+          "value": 18.0
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "name": "Vanguard Junrock",
+      "set": "SunSinkingEclipse",
+      "cost": 1,
+      "level": 25,
+      "main_stat": {
+        "stat": "AtkPct",
+        "value": 18.0
+      },
+      "substats": [
+        {
+          "stat": "Atk",
+          "value": 30.0
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "name": "Whiff Whaff",
+      "set": "SunSinkingEclipse",
+      "cost": 1,
+      "level": 25,
+      "main_stat": {
+        "stat": "HpPct",
+        "value": 22.8
+      },
+      "substats": [
+        {
+          "stat": "HpPct",
+          "value": 8.0
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "name": "Excarat",
+      "set": "MoltenRiftEmbers",
+      "cost": 1,
+      "level": 25,
+      "main_stat": {
+        "stat": "AtkPct",
+        "value": 18.0
+      },
+      "substats": [
+        {
+          "stat": "CritDmg",
+          "value": 12.6
+        }
+      ]
+    }
+  ]
+}

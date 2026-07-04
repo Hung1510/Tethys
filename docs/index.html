@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Primary SEO -->
+<title>Tethys — Wuthering Waves Echo Optimizer &amp; Scanner (Native, Open Source)</title>
+<meta name="description" content="Tethys is a free, open-source native tool for Wuthering Waves. Scan your echoes from the screen with OCR, then compute the mathematically best echo build with a genetic-algorithm substat optimizer.">
+<meta name="keywords" content="Wuthering Waves echo optimizer, WuWa echo scanner, Wuthering Waves substat optimizer, best echo build, WuWa build calculator, echo OCR, Wuthering Waves tool">
+<link rel="canonical" href="https://hung1510.github.io/tethys/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="theme-color" content="#061019">
+
+<!-- Icons -->
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+
+<!-- Google Search Console: after adding this site in Console, paste the tag
+     it gives you here (or verify via DNS instead).
+<meta name="google-site-verification" content="YOUR_TOKEN_HERE">
+-->
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Tethys">
+<meta property="og:title" content="Tethys — Wuthering Waves Echo Optimizer &amp; Scanner">
+<meta property="og:description" content="Scan your Wuthering Waves echoes from the screen and get the mathematically best build. Free, native, open source.">
+<meta property="og:url" content="https://hung1510.github.io/tethys/">
+<meta property="og:image" content="https://hung1510.github.io/tethys/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Tethys — Wuthering Waves Echo Optimizer &amp; Scanner">
+<meta name="twitter:description" content="Scan your Wuthering Waves echoes and get the mathematically best build. Free, native, open source.">
+<meta name="twitter:image" content="https://hung1510.github.io/tethys/og-image.png">
+
+<!-- Structured data: the software itself -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Tethys",
+  "applicationCategory": "GameApplication",
+  "applicationSubCategory": "Wuthering Waves echo optimizer",
+  "operatingSystem": "Windows",
+  "description": "A native, open-source Wuthering Waves echo optimizer and scanner. Reads echoes from the screen via OCR and computes the best build with a genetic-algorithm substat optimizer.",
+  "url": "https://hung1510.github.io/tethys/",
+  "downloadUrl": "https://github.com/Hung1510/tethys",
+  "softwareVersion": "0.1.0",
+  "license": "https://opensource.org/licenses/MIT",
+  "author": { "@type": "Person", "name": "Pham Tran Gia Hung" },
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+
+<!-- Structured data: FAQ (targets real search queries) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the best Wuthering Waves echo optimizer?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Tethys is a free, open-source, native echo optimizer for Wuthering Waves. It scans your echoes from the screen and finds the mathematically best five-echo build for a chosen character using a genetic algorithm that is tested against a brute-force optimum." }
+    },
+    {
+      "@type": "Question",
+      "name": "How do I scan my echoes in Wuthering Waves?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Tethys captures the game window, locates the echo panel using a resolution-independent layout, and runs OCR to read each stat. A calibration overlay lets you line up the scan regions with your own resolution." }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Tethys free and safe to use?",
+      "acceptedAnswer": { "@type": "Answer", "text": "Yes. Tethys is free and open source under the MIT license. It only reads values from your own screen; it does not modify, inject into, or automate the game." }
+    }
+  ]
+}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --abyss: #061019;
+    --deep: #0b1a28;
+    --panel: #102436;
+    --line: #1c3346;
+    --foam: #e6f3f7;
+    --muted: #8fa9b6;
+    --accent: #35e0d0;
+    --accent-dim: #1c8a83;
+    --sky: #7ee0ff;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--abyss);
+    color: var(--foam);
+    font-family: "Inter", system-ui, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px; }
+  h1, h2, h3 { font-family: "Space Grotesk", sans-serif; line-height: 1.1; letter-spacing: -0.01em; }
+
+  /* Header */
+  header {
+    position: sticky; top: 0; z-index: 10;
+    background: rgba(6, 16, 25, 0.82);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .nav { display: flex; align-items: center; justify-content: space-between; height: 62px; }
+  .brand { font-family: "Space Grotesk"; font-weight: 700; font-size: 22px; letter-spacing: 0.02em; }
+  .brand span { color: var(--accent); }
+  .nav-links { display: flex; gap: 26px; align-items: center; }
+  .nav-links a { color: var(--muted); font-size: 15px; }
+  .nav-links a:hover { color: var(--foam); text-decoration: none; }
+  .btn {
+    display: inline-block; font-weight: 600; font-family: "Space Grotesk";
+    padding: 10px 18px; border-radius: 8px; font-size: 15px;
+    background: var(--accent); color: #042320;
+    border: 1px solid var(--accent);
+  }
+  .btn:hover { background: #5cf0e2; text-decoration: none; }
+  .btn.ghost { background: transparent; color: var(--foam); border-color: var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); background: #0e2130; }
+
+  /* Hero */
+  .hero { position: relative; padding: 96px 0 60px; overflow: hidden; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace; font-size: 13px; letter-spacing: 0.22em;
+    color: var(--accent); text-transform: uppercase; margin-bottom: 22px;
+  }
+  .hero h1 { font-size: clamp(38px, 6vw, 68px); margin: 0 0 20px; max-width: 16ch; }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p.lede { font-size: clamp(17px, 2.4vw, 21px); color: var(--muted); max-width: 60ch; margin: 0 0 34px; }
+  .cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  /* Signature resonance wave */
+  .wave { position: absolute; left: 0; right: 0; bottom: -6px; height: 160px; width: 100%; opacity: 0.5; pointer-events: none; }
+  .wave path { fill: none; stroke: var(--accent-dim); stroke-width: 2; }
+  .wave .lead { stroke: var(--accent); stroke-width: 2.5; }
+  @keyframes drift { from { transform: translateX(0); } to { transform: translateX(-260px); } }
+  .wave .anim { animation: drift 14s linear infinite; }
+
+  /* Motivation strip */
+  .strip { border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: var(--deep); }
+  .strip .wrap { padding: 26px 24px; display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; }
+  .strip b { font-family: "Space Grotesk"; color: var(--foam); }
+  .strip span { color: var(--muted); }
+
+  /* Sections */
+  section.block { padding: 72px 0; }
+  .kicker { font-family: "IBM Plex Mono", monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 12px; }
+  section h2 { font-size: clamp(26px, 4vw, 38px); margin: 0 0 34px; }
+
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; }
+  .card {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 26px;
+  }
+  .card h3 { font-size: 20px; margin: 0 0 8px; }
+  .card p { color: var(--muted); margin: 0; font-size: 15.5px; }
+  .card .tag { font-family: "IBM Plex Mono", monospace; font-size: 12px; color: var(--accent); }
+
+  /* Pipeline */
+  .pipe { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; }
+  .step { flex: 1 1 160px; background: var(--deep); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+  .step .n { font-family: "IBM Plex Mono"; color: var(--accent); font-size: 13px; }
+  .step h4 { font-family: "Space Grotesk"; margin: 6px 0 6px; font-size: 17px; }
+  .step p { color: var(--muted); font-size: 14px; margin: 0; }
+
+  /* Shot */
+  figure.shot { margin: 0; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--deep); }
+  figure.shot img { display: block; width: 100%; height: auto; }
+  figure.shot figcaption { padding: 14px 18px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--line); }
+
+  /* Code */
+  pre {
+    background: #04121b; border: 1px solid var(--line); border-radius: 12px; padding: 20px;
+    overflow-x: auto; font-family: "IBM Plex Mono", monospace; font-size: 14px; color: #cfe9ee;
+  }
+  pre .c { color: var(--muted); }
+  pre .a { color: var(--accent); }
+
+  /* FAQ */
+  .faq details { border: 1px solid var(--line); border-radius: 12px; padding: 4px 20px; margin-bottom: 12px; background: var(--panel); }
+  .faq summary { cursor: pointer; font-family: "Space Grotesk"; font-weight: 500; padding: 16px 0; font-size: 17px; list-style: none; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary::after { content: "+"; float: right; color: var(--accent); }
+  .faq details[open] summary::after { content: "–"; }
+  .faq p { color: var(--muted); margin: 0 0 16px; }
+
+  footer { border-top: 1px solid var(--line); background: var(--deep); padding: 40px 0; color: var(--muted); font-size: 14px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .disclaimer { max-width: 62ch; }
+
+  @media (max-width: 720px) {
+    .grid { grid-template-columns: 1fr; }
+    .nav-links a:not(.btn) { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .wave .anim { animation: none; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <div class="brand">Teth<span>ys</span></div>
+    <nav class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#faq">FAQ</a>
+      <a class="btn" href="https://github.com/Hung1510/tethys">View on GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Native · Rust · Open source</div>
+      <h1>The <em>Wuthering Waves</em> echo optimizer that reads your screen.</h1>
+      <p class="lede">Tethys scans your echo inventory with OCR, then computes the mathematically best five-echo build for your character — a genetic-algorithm substat optimizer tested against a brute-force optimum. Free, native, and open source.</p>
+      <div class="cta-row">
+        <a class="btn" href="https://github.com/Hung1510/tethys">Get it on GitHub</a>
+        <a class="btn ghost" href="#how">See how scanning works</a>
+      </div>
+    </div>
+    <svg class="wave" viewBox="0 0 1440 160" preserveAspectRatio="none" aria-hidden="true">
+      <path class="anim" d="M-260,90 Q-195,50 -130,90 T0,90 T130,90 T260,90 T390,90 T520,90 T650,90 T780,90 T910,90 T1040,90 T1170,90 T1300,90 T1430,90 T1560,90 T1690,90"/>
+      <path class="lead anim" d="M-260,110 Q-195,78 -130,110 T0,110 T130,110 T260,110 T390,110 T520,110 T650,110 T780,110 T910,110 T1040,110 T1170,110 T1300,110 T1430,110 T1560,110 T1690,110"/>
+    </svg>
+  </section>
+
+  <div class="strip">
+    <div class="wrap">
+      <b>The gap this fills.</b>
+      <span>The community's main open-source optimizer, WuWaOpt, was archived after patch 2.1. Most of what's left is web-based. Tethys is a maintained, native desktop tool that does the whole loop — scan, then optimize — in one place.</span>
+    </div>
+  </div>
+
+  <section class="block" id="features">
+    <div class="wrap">
+      <div class="kicker">What it does</div>
+      <h2>Scan, optimize, done.</h2>
+      <div class="grid">
+        <div class="card">
+          <div class="tag">// scan</div>
+          <h3>Read echoes from the screen</h3>
+          <p>Captures the game window and OCRs the echo panel — no manual data entry. Resolution-independent region detection handles ultrawide, 16:10, and windowed play.</p>
+        </div>
+        <div class="card">
+          <div class="tag">// optimize</div>
+          <h3>The mathematically best build</h3>
+          <p>A genetic algorithm searches your whole inventory for the best five-echo build, respecting set bonuses and main-stat preferences — and it's tested to match a brute-force optimum.</p>
+        </div>
+        <div class="card">
+          <div class="tag">// calibrate</div>
+          <h3>Line it up in seconds</h3>
+          <p>A calibration overlay draws the detected scan regions onto a screenshot, so you can confirm alignment at your own resolution and tune it if needed.</p>
+        </div>
+        <div class="card">
+          <div class="tag">// open</div>
+          <h3>Scriptable and open</h3>
+          <p>Plain-JSON inventories, a command-line interface, and an MIT license. The optimizer core is a pure, fully-tested Rust crate you can build on.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="how" style="background:var(--deep); border-top:1px solid var(--line); border-bottom:1px solid var(--line);">
+    <div class="wrap">
+      <div class="kicker">How it works</div>
+      <h2>From pixels to a build.</h2>
+      <div class="pipe">
+        <div class="step"><div class="n">01</div><h4>Capture</h4><p>Grab the Wuthering Waves window by title — position and overlap don't matter.</p></div>
+        <div class="step"><div class="n">02</div><h4>Locate</h4><p>Find the 16:9 content area inside the window, then place scan regions as fractions of it.</p></div>
+        <div class="step"><div class="n">03</div><h4>Read</h4><p>OCR the main stat and substats, parsing percent-vs-flat values into typed stats.</p></div>
+        <div class="step"><div class="n">04</div><h4>Optimize</h4><p>Search the inventory for the highest-scoring valid five-echo build.</p></div>
+      </div>
+      <figure class="shot" style="margin-top:34px;">
+        <img src="calibration-demo.png" alt="Tethys calibration overlay showing detected echo grid cells and detail-panel scan regions on a Wuthering Waves layout" loading="lazy" width="1920" height="1080">
+        <figcaption>The calibration overlay: magenta = inventory grid cells for batch scanning; red / amber / green / cyan = the detail panel's name, cost, main stat, and substats.</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="block">
+    <div class="wrap">
+      <div class="kicker">Try it</div>
+      <h2>One command to a build.</h2>
+      <pre><span class="c"># clone and run the optimizer on the bundled sample</span>
+git clone https://github.com/Hung1510/tethys
+cd tethys
+cargo run --release -p tethys-app -- <span class="a">optimize</span> sample_inventory.json --profile dps
+
+<span class="c"># check the scan regions line up with your resolution</span>
+cargo run -p tethys-app --features capture -- <span class="a">calibrate</span> cal.png --grid</pre>
+    </div>
+  </section>
+
+  <section class="block faq" id="faq" style="background:var(--deep); border-top:1px solid var(--line);">
+    <div class="wrap">
+      <div class="kicker">Questions</div>
+      <h2>Good to know.</h2>
+      <details open>
+        <summary>What is the best Wuthering Waves echo optimizer?</summary>
+        <p>Tethys is a free, open-source, native optimizer. It scans your echoes from the screen and finds the best five-echo build for a chosen character with a genetic algorithm that's tested against a brute-force optimum — so you can trust the result.</p>
+      </details>
+      <details>
+        <summary>How do I scan my echoes in Wuthering Waves?</summary>
+        <p>Open an echo in-game and run Tethys. It captures the window, locates the echo panel with resolution-independent region detection, and OCRs each stat. The calibration overlay lets you align the regions to your own display.</p>
+      </details>
+      <details>
+        <summary>Is it safe? Does it touch the game?</summary>
+        <p>Tethys only reads values from your own screen. It does not modify, inject into, or automate the game. It's open source under the MIT license, so you can read exactly what it does.</p>
+      </details>
+      <details>
+        <summary>Which platforms are supported?</summary>
+        <p>The capture and OCR target Windows, where Wuthering Waves runs. The optimizer core is pure Rust and runs anywhere, so you can optimize an exported inventory on any OS.</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="brand" style="font-size:18px; margin-bottom:8px;">Teth<span>ys</span></div>
+      <a href="https://github.com/Hung1510/tethys">GitHub</a> · <a href="https://opensource.org/licenses/MIT">MIT License</a>
+    </div>
+    <div class="disclaimer">
+      A fan-made tool, not affiliated with or endorsed by Kuro Games. Wuthering Waves and all related assets are property of Kuro Games.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

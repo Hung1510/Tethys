@@ -1,0 +1,27 @@
+{
+  "name": "Generic DPS",
+  "substat_weights": {
+    "CritDmg": 1.0,
+    "Atk": 0.4,
+    "BasicAtk": 0.5,
+    "ResonanceLiberation": 0.5,
+    "EnergyRegen": 0.25,
+    "AtkPct": 0.75,
+    "ResonanceSkill": 0.5,
+    "HeavyAtk": 0.5,
+    "CritRate": 1.0
+  },
+  "main_stat_weights": {
+    "CritDmg": 1.0,
+    "AtkPct": 0.75,
+    "Spectro": 0.9,
+    "Fusion": 0.9,
+    "Glacio": 0.9,
+    "CritRate": 1.0,
+    "Electro": 0.9,
+    "Aero": 0.9,
+    "Havoc": 0.9
+  },
+  "preferred_set": null,
+  "set_bonus": 0.0
+}

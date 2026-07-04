@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      # Hard gates — the crate logic must build and pass tests.
+      - name: Build (default features)
+        run: cargo build --workspace --verbose
+      - name: Test (default features)
+        run: cargo test --workspace --verbose
+      # Advisory gates — reported but non-blocking. Flip continue-on-error to
+      # false (and add `-D warnings` to clippy) once you've run them once.
+      - name: Format
+        run: cargo fmt --all -- --check
+        continue-on-error: true
+      - name: Clippy
+        run: cargo clippy --workspace
+        continue-on-error: true

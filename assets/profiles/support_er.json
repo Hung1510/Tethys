@@ -1,0 +1,19 @@
+{
+  "name": "Support (Energy Regen)",
+  "substat_weights": {
+    "CritRate": 0.6,
+    "CritDmg": 0.6,
+    "HpPct": 0.4,
+    "EnergyRegen": 1.0,
+    "Hp": 0.2
+  },
+  "main_stat_weights": {
+    "HealingBonus": 0.8,
+    "HpPct": 0.5,
+    "EnergyRegen": 1.0,
+    "CritDmg": 0.7,
+    "CritRate": 0.7
+  },
+  "preferred_set": "RejuvenatingGlow",
+  "set_bonus": 2.0
+}

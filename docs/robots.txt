@@ -1,0 +1,5 @@
+# Tethys — https://github.com/Hung1510/tethys
+User-agent: *
+Allow: /
+
+Sitemap: https://hung1510.github.io/tethys/sitemap.xml
