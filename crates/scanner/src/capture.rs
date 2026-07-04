@@ -27,13 +27,22 @@ pub struct Region {
 pub fn capture_region(region: Region) -> Result<RgbaImage> {
     use xcap::Monitor;
 
-    let monitors = Monitor::all()?;
+    let monitors = Monitor::all().map_err(|e| anyhow::anyhow!("enumerating monitors: {e}"))?;
     let monitor = monitors
         .into_iter()
         .next()
         .ok_or_else(|| anyhow::anyhow!("no monitor found"))?;
 
-    let full = monitor.capture_image()?; // RgbaImage of the whole monitor
+    let shot = monitor
+        .capture_image()
+        .map_err(|e| anyhow::anyhow!("capturing monitor: {e}"))?;
+
+    // xcap bundles its own `image` version, so convert to this crate's
+    // `RgbaImage` through the raw buffer before using our `image::imageops`.
+    // Mixing the two `image` versions directly is a compile error.
+    let (fw, fh) = (shot.width(), shot.height());
+    let full = RgbaImage::from_raw(fw, fh, shot.into_raw())
+        .ok_or_else(|| anyhow::anyhow!("captured buffer did not match {fw}x{fh}"))?;
 
     // Crop to the requested region, clamped to the captured bounds.
     let x = region.x.min(full.width());
