@@ -103,3 +103,25 @@ pub fn capture_window_image() -> Result<RgbaImage> {
 pub fn capture_window_image() -> Result<RgbaImage> {
     anyhow::bail!("screen capture is disabled; build tethys-scanner with the `capture` feature")
 }
+
+/// List the title (and minimized state) of every enumerable top-level window.
+///
+/// A diagnostic for when [`capture_window_image`] can't find the game: run it
+/// to see the exact title Wuthering Waves reports, then confirm it matches
+/// [`GAME_WINDOW_TITLE`]. Requires the `capture` feature, and must run elevated
+/// to see the (elevated) game window.
+#[cfg(feature = "capture")]
+pub fn list_windows() -> Result<Vec<(String, bool)>> {
+    use xcap::Window;
+
+    let windows = Window::all().map_err(|e| anyhow::anyhow!("enumerating windows: {e}"))?;
+    Ok(windows
+        .into_iter()
+        .map(|w| (w.title().to_string(), w.is_minimized()))
+        .collect())
+}
+
+#[cfg(not(feature = "capture"))]
+pub fn list_windows() -> Result<Vec<(String, bool)>> {
+    anyhow::bail!("screen capture is disabled; build tethys-scanner with the `capture` feature")
+}
