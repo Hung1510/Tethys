@@ -11,16 +11,6 @@
   <img alt="Rust" src="https://img.shields.io/badge/rust-stable-orange.svg">
 </p>
 
-<!--
-  ┌───────────────────────────────────────────────────────────────────┐
-  │  RECORD A DEMO GIF AND PUT IT HERE. This is the single highest-     │
-  │  impact thing you can do for stars. 5–8 seconds: open the app,      │
-  │  hit "scan", watch echoes populate, hit "optimize", show the build. │
-  │  Tools: ScreenToGif (Windows, free) or ShareX. Keep it < 3 MB.      │
-  └───────────────────────────────────────────────────────────────────┘
--->
-<p align="center"><i>▶ demo GIF goes here — see the comment above</i></p>
-
 ---
 
 ## Why
