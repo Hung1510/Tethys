@@ -258,13 +258,17 @@ impl GridLayout {
     /// Calibration starting point for a typical 16:9 inventory page: five
     /// columns of tiles down the left side. Verify with the grid overlay and
     /// tune, exactly as with the detail-panel layout.
+    /// Calibration starting point for a typical 16:9 inventory page. The echo
+    /// backpack shows a 4-column by 6-row grid (24 tiles) per page — a data
+    /// point taken from the community's WuWaOpt scanner. Verify with the grid
+    /// overlay and tune as needed.
     pub fn default_16_9() -> Self {
         Self {
-            area: NormRect::new(0.020, 0.200, 0.600, 0.720),
-            cols: 5,
-            rows: 4,
+            area: NormRect::new(0.055, 0.175, 0.560, 0.760),
+            cols: 4,
+            rows: 6,
             col_gap: 0.020,
-            row_gap: 0.030,
+            row_gap: 0.022,
         }
     }
 
@@ -409,7 +413,7 @@ mod tests {
         let grid = GridLayout::default_16_9();
         let cells = grid.cells(content);
         assert_eq!(cells.len(), grid.cell_count());
-        assert_eq!(cells.len(), 20); // 5 x 4
+        assert_eq!(cells.len(), 24); // 4 x 6
 
         // Row-major: within a row x increases; between rows y increases.
         for r in 0..grid.rows as usize {

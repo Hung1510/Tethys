@@ -29,6 +29,7 @@ fn main() {
 fn run() -> Result<()> {
     let args: Vec<String> = env::args().skip(1).collect();
     match args.first().map(String::as_str) {
+        None => default_action(),
         Some("sample") => {
             let inv = sample::sample_inventory();
             println!("{}", serde_json::to_string_pretty(&inv)?);
@@ -236,6 +237,19 @@ fn launch_gui() -> Result<()> {
 #[cfg(not(feature = "gui"))]
 fn launch_gui() -> Result<()> {
     anyhow::bail!("this build has no GUI; rebuild with `--features gui`")
+}
+
+/// What happens when the binary is run with no arguments (e.g. double-clicked):
+/// open the GUI if this build has one, otherwise print usage.
+#[cfg(feature = "gui")]
+fn default_action() -> Result<()> {
+    launch_gui()
+}
+
+#[cfg(not(feature = "gui"))]
+fn default_action() -> Result<()> {
+    print_usage();
+    Ok(())
 }
 
 fn print_usage() {

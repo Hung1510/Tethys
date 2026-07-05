@@ -1,0 +1,46 @@
+name: Release
+
+# Cut a release by pushing a version tag:
+#   git tag v0.1.0
+#   git push origin v0.1.0
+# This builds the Windows binary and attaches it to a GitHub Release.
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - uses: Swatinem/rust-cache@v2
+
+      # Build the full product: capture (screen scanning) + gui (double-click app).
+      # If the GUI ever fails to build, drop `,gui` here to still ship the CLI.
+      - name: Build release binary
+        run: cargo build --release -p tethys-app --features capture,gui
+
+      - name: Package
+        shell: pwsh
+        run: |
+          $stage = "tethys-windows-x64"
+          New-Item -ItemType Directory -Force -Path $stage | Out-Null
+          Copy-Item target/release/tethys.exe $stage/
+          Copy-Item sample_inventory.json $stage/
+          Copy-Item README.md $stage/
+          Copy-Item LICENSE $stage/
+          Compress-Archive -Path "$stage/*" -DestinationPath "tethys-windows-x64.zip" -Force
+
+      - name: Publish release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: tethys-windows-x64.zip
+          generate_release_notes: true
