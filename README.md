@@ -50,8 +50,6 @@ The community's go-to open-source optimizer, [WuWaOpt](https://github.com/EMCJav
 | Damage-formula evaluator | 🔜 roadmap |
 | Shorekeeper-themed skin | 🔜 roadmap |
 
-This is an honest v1: the hard, interesting part — the optimizer — is finished and covered by tests. The Windows-specific capture/OCR and the GUI are wired with the right libraries and ready to flesh out.
-
 ## Quick start
 
 ```bash
@@ -122,33 +120,6 @@ cargo run -p tethys-app --features capture -- calibrate cal.png --grid
 ```
 
 Inventory tiles show a summary (main stat, level), so the grid scan is for fast triage across a page; reading an echo's full substats still uses the detail-panel scan. By design Tethys only reads the screen — it never clicks or pages through the grid for you, to stay firmly on the right side of the game's terms.
-
-## Website
-
-A landing page for the project lives in [`docs/`](docs/), built for search visibility: `SoftwareApplication` and `FAQPage` structured data (JSON-LD), Open Graph / Twitter cards, a full favicon + PWA icon set (`favicon.svg`, `.ico`, apple-touch, 192/512 PNGs, `site.webmanifest`), social share images (`og-image.png` 1200×630 and a square `og-image-square.png`), a `sitemap.xml`, and a `robots.txt`.
-
-### Publish it
-
-GitHub → repo **Settings → Pages** → Source: **Deploy from a branch** → Branch: `main`, folder: `/docs`. It serves at `https://hung1510.github.io/tethys/`. All asset paths in the page are relative, so it works at that sub-path as-is.
-
-### Get it indexed
-
-- Add the site as a property in **Google Search Console**, then **submit `sitemap.xml`** — that's what actually gets it crawled (you already have Console set up from the WARNO project). Verify ownership either via the meta tag (a commented placeholder is in `index.html`) or a DNS TXT record.
-- Technical SEO makes the page *eligible* to rank; it doesn't guarantee position. Links and traffic do that — which is what the subreddit / Discord launch is for.
-
-### Custom domain (optional, and it tightens SEO)
-
-A custom domain (e.g. `tethys.tools`) makes `robots.txt` authoritative at the host root and gives cleaner share URLs. Steps:
-
-1. In **Settings → Pages → Custom domain**, enter your domain. GitHub commits a `docs/CNAME` file containing it.
-2. Set DNS at your registrar:
-   - Apex (`tethys.tools`): four `A` records to GitHub Pages — `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` (and the matching `AAAA` records for IPv6). Confirm the current IPs in GitHub's Pages docs before relying on them.
-   - Subdomain (`www.` or `app.`): a `CNAME` record pointing to `hung1510.github.io`.
-3. Tick **Enforce HTTPS** once the cert provisions.
-4. Update the absolute URLs to the new domain in three places: the `<link rel="canonical">`, `og:url`, and `og:image` tags in `docs/index.html`; the `<loc>` in `docs/sitemap.xml`; and the `Sitemap:` line in `docs/robots.txt`.
-
-> Why the `robots.txt` caveat matters: on a project page the crawler only reads `hung1510.github.io/robots.txt` (the user root), not `/tethys/robots.txt`. A custom domain puts your `robots.txt` at the root where it's authoritative. Until then, the `<meta name="robots">` tag and the Console sitemap submission do the real work.
-
 
 ## How it works
 
