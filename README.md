@@ -35,10 +35,18 @@ The community's go-to open-source optimizer, [WuWaOpt](https://github.com/EMCJav
 | Inventory-grid detection + tile batch-scan | ✅ done, tested |
 | Landing page + SEO (structured data, sitemap, OG) | ✅ done |
 | Screen capture (xcap window grab) | 🟡 wired, behind `capture` feature |
+| Windows OCR backend (`Windows.Media.Ocr`, no install) + `scan` command | ✅ done, behind `windows-ocr` feature |
 | Tesseract OCR backend | 🟡 wired, behind `tesseract` feature |
-| Desktop GUI (egui) | 🟡 scaffold, behind `gui` feature |
+| Desktop GUI (egui) — load inventory, pick profile, optimize | ✅ works, behind `gui` feature |
+| Prebuilt Windows binary (GitHub Release on tag) | ✅ done |
 | Damage-formula evaluator | 🔜 roadmap |
 | Shorekeeper-themed skin | 🔜 roadmap |
+
+## Download
+
+Grab the latest Windows build from the [Releases page](https://github.com/Hung1510/tethys/releases) — unzip and run `tethys.exe`. Double-clicking opens the GUI; the same binary also has the CLI subcommands below.
+
+> Because the binary isn't code-signed yet, Windows SmartScreen/Defender may warn on first run ("Windows protected your PC"). Click **More info → Run anyway**.
 
 ## Quick start
 
@@ -76,15 +84,17 @@ Recommended build (genetic solver)
 ### Enabling capture, OCR, and the GUI
 
 ```bash
-# Real screen capture:
-cargo build -p tethys-scanner --features capture
-# Tesseract OCR (needs libtesseract + libleptonica installed on the system):
-cargo build -p tethys-scanner --features tesseract
+# Read the open echo panel (screen capture + built-in Windows OCR, no install):
+cargo run -p tethys-app --features capture,windows-ocr -- scan
 # Desktop GUI:
 cargo run -p tethys-app --features gui -- gui
+# Tesseract OCR instead of Windows OCR (needs libtesseract installed):
+cargo build -p tethys-scanner --features tesseract
 ```
 
-> On Windows the game runs elevated, so Tethys must run elevated for capture to see its window.
+`scan` captures the game window, locates the echo detail panel, and reads its stats with the OS's built-in `Windows.Media.Ocr` engine — no Tesseract or other install required. If it reports no stats, run `calibrate` and nudge the regions.
+
+> On Windows the game runs elevated, so Tethys must run elevated for capture to see its window. Set Windows display scaling to 100% for the scan regions to line up (the scanner works in physical pixels). Windows OCR uses the English language feature — installed by default on most systems; if `scan` reports no OCR engine, add it under Settings → Time & language → Language → English → Optional features.
 
 ### Finding the echo panel on screen (capture-region detection)
 
@@ -179,7 +189,7 @@ Patch-specific numbers (substat roll ceilings, main-stat pools, set names) live 
 
 ## Roadmap
 
-- [ ] Windows.Media.Ocr backend (no external install, handles the game font well)
+- [x] Windows.Media.Ocr backend (no external install, handles the game font well)
 - [ ] Damage-formula evaluator using character base stats
 - [x] Locate the echo panel across window shapes (16:9 fit + calibration overlay)
 - [x] Extend region detection to the echo *grid* — tile geometry + per-tile batch scan
