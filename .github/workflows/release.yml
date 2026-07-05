@@ -23,10 +23,11 @@ jobs:
 
       - uses: Swatinem/rust-cache@v2
 
-      # Build the full product: capture (screen scanning) + gui (double-click app).
-      # If the GUI ever fails to build, drop `,gui` here to still ship the CLI.
+      # Build the full product: capture (screen scanning) + windows-ocr
+      # (reads the text, no install needed) + gui (double-click app).
+      # If any optional piece fails to build, trim the feature list here.
       - name: Build release binary
-        run: cargo build --release -p tethys-app --features capture,gui
+        run: cargo build --release -p tethys-app --features capture,windows-ocr,gui
 
       - name: Package
         shell: pwsh

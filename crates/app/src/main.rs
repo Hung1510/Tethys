@@ -37,12 +37,49 @@ fn run() -> Result<()> {
         }
         Some("optimize") => cmd_optimize(&args[1..]),
         Some("calibrate") => cmd_calibrate(&args[1..]),
+        Some("scan") => cmd_scan(),
         Some("windows") => cmd_list_windows(),
         Some("--gui") | Some("gui") => launch_gui(),
         _ => {
             print_usage();
             Ok(())
         }
+    }
+}
+
+fn cmd_scan() -> Result<()> {
+    #[cfg(all(feature = "capture", feature = "windows-ocr"))]
+    {
+        let engine = tethys_scanner::ocr::WindowsOcr::new()
+            .with_context(|| "starting the Windows OCR engine")?;
+        let image = tethys_scanner::capture::capture_window_image()?;
+        let stats = tethys_scanner::scan_echo_panel(
+            &engine,
+            &image,
+            &tethys_scanner::EchoDetailLayout::default_16_9(),
+        )?;
+
+        if stats.is_empty() {
+            println!(
+                "Read no stats. Open an echo's detail panel in-game, then check the \
+                 regions line up with `tethys calibrate cal.png`."
+            );
+        } else {
+            println!("Read {} stat(s) from the open echo panel:", stats.len());
+            for s in &stats {
+                let pct = if s.stat.is_percent() { "%" } else { "" };
+                println!("  {:?}  {:.1}{pct}", s.stat, s.value);
+            }
+        }
+        return Ok(());
+    }
+
+    #[cfg(not(all(feature = "capture", feature = "windows-ocr")))]
+    {
+        anyhow::bail!(
+            "scan needs the `capture` and `windows-ocr` features; \
+             build with --features capture,windows-ocr"
+        )
     }
 }
 
@@ -259,6 +296,7 @@ fn print_usage() {
          \x20 tethys sample                       print a sample inventory (JSON schema)\n\
          \x20 tethys optimize <inv.json> [flags]  optimize a build\n\
          \x20 tethys calibrate [out.png] [--grid]  save a capture-region overlay (needs `capture`)\n\
+         \x20 tethys scan                          read the open echo panel (needs `capture,windows-ocr`)\n\
          \x20 tethys windows                        list window titles for scan setup (needs `capture`)\n\n\
          OPTIMIZE FLAGS:\n\
          \x20 --profile <dps|support>   weighting to optimize for (default: dps)\n\

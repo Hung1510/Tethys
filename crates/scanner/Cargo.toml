@@ -23,9 +23,23 @@ xcap = { version = "0.0.12", optional = true }
 # Tesseract binding. Requires the system libtesseract; optional for that reason.
 rusty-tesseract = { version = "1.1", optional = true }
 
+# Windows built-in OCR (Windows.Media.Ocr) — no external install required.
+# Only referenced on Windows targets; behind the `windows-ocr` feature.
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.58", optional = true, features = [
+    "Media_Ocr",
+    "Graphics_Imaging",
+    "Storage_Streams",
+    "Globalization",
+    "Foundation",
+    "Foundation_Collections",
+] }
+
 [features]
 default = []
 # Enable real screen capture (xcap: Windows / macOS / Linux).
 capture = ["dep:xcap"]
 # Enable the Tesseract OCR backend (needs libtesseract + libleptonica installed).
 tesseract = ["dep:rusty-tesseract"]
+# Enable the built-in Windows OCR backend (Windows only, no install needed).
+windows-ocr = ["dep:windows"]

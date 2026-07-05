@@ -28,3 +28,4 @@ gui = ["dep:eframe"]
 # real capture / OCR, e.g. `cargo run -p tethys-app --features capture`.
 capture = ["tethys-scanner/capture"]
 tesseract = ["tethys-scanner/tesseract"]
+windows-ocr = ["tethys-scanner/windows-ocr"]
