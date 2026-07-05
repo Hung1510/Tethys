@@ -15,8 +15,10 @@ pub mod ocr;
 
 use anyhow::Result;
 use image::RgbaImage;
-use tethys_core::model::StatRoll;
-use tethys_core::parse::parse_lines;
+use tethys_core::model::{Echo, EchoSet, StatRoll};
+use tethys_core::parse::{
+    infer_cost_from_main, parse_cost, parse_lines, parse_set_name, parse_substat_line,
+};
 
 pub use layout::{
     crop, draw_grid_overlay, draw_overlay, fit_16_9, EchoDetailLayout, GridLayout, NormRect,
@@ -60,6 +62,80 @@ pub fn scan_echo_panel(
 
     let refs: Vec<&str> = lines.iter().map(|s| s.as_str()).collect();
     Ok(parse_lines(refs))
+}
+
+/// An echo read from the detail panel. Fields are `Option` because OCR can miss
+/// any of them; [`ScannedEcho::into_echo`] reports which were missing.
+#[derive(Debug, Clone)]
+pub struct ScannedEcho {
+    pub name: String,
+    pub cost: Option<u8>,
+    pub set: Option<EchoSet>,
+    pub main_stat: Option<StatRoll>,
+    pub substats: Vec<StatRoll>,
+}
+
+impl ScannedEcho {
+    /// Assemble a complete [`Echo`] with the given id, or return the name of the
+    /// first missing field. Cost falls back to being inferred from the main
+    /// stat when the main stat only occurs at one cost.
+    pub fn into_echo(self, id: u32) -> std::result::Result<Echo, &'static str> {
+        let main_stat = self.main_stat.ok_or("main stat")?;
+        let cost = self
+            .cost
+            .or_else(|| infer_cost_from_main(main_stat.stat))
+            .ok_or("cost")?;
+        let set = self.set.ok_or("set")?;
+        Ok(Echo {
+            id,
+            name: self.name,
+            set,
+            cost,
+            level: 25,
+            main_stat,
+            substats: self.substats,
+        })
+    }
+}
+
+/// Read a whole echo from the open detail panel: name, cost, set, main stat,
+/// and substats, each from its own region. Lines within a region are joined
+/// before parsing so a label and value split onto two OCR lines still resolve.
+pub fn scan_echo(
+    engine: &dyn OcrEngine,
+    window_image: &RgbaImage,
+    layout: &EchoDetailLayout,
+) -> Result<ScannedEcho> {
+    let content = fit_16_9(window_image.width(), window_image.height());
+    let r = layout.resolve(content);
+
+    let read =
+        |rect: PixelRect| -> Result<Vec<String>> { engine.recognize(&crop(window_image, rect)) };
+    let joined = |rect: PixelRect| -> Result<String> { Ok(read(rect)?.join(" ")) };
+
+    let name = joined(r.name)?.trim().to_string();
+    let cost = parse_cost(&joined(r.cost)?);
+    let set = parse_set_name(&joined(r.set)?);
+
+    // Prefer the first line in the region that parses as a stat (the common
+    // case where label and value share a row); fall back to joining lines in
+    // case OCR split the label and value onto separate rows.
+    let main_lines = read(r.main_stat)?;
+    let main_stat = main_lines
+        .iter()
+        .find_map(|l| parse_substat_line(l))
+        .or_else(|| parse_substat_line(&main_lines.join(" ")));
+
+    let substat_lines = read(r.substats)?;
+    let substats = parse_lines(substat_lines.iter().map(|s| s.as_str()));
+
+    Ok(ScannedEcho {
+        name,
+        cost,
+        set,
+        main_stat,
+        substats,
+    })
 }
 
 /// Produce a calibration overlay: the captured window image with each detected
@@ -230,5 +306,45 @@ mod tests {
         let overlay = calibrate_grid(&img, &GridLayout::default_16_9());
         let changed = overlay.pixels().zip(img.pixels()).any(|(a, b)| a != b);
         assert!(changed, "grid overlay drew nothing");
+    }
+
+    #[test]
+    fn scan_echo_assembles_a_complete_echo() {
+        // A mock that returns different lines per region would need spatial
+        // awareness; instead we return a superset and rely on each parser to
+        // pick out its field. The set line and cost line are both present, so
+        // scan_echo should resolve every field into a valid Echo.
+        let engine = MockOcr::new([
+            "Sun-sinking Eclipse",
+            "COST 4",
+            "Crit. DMG 44.0%",
+            "Crit. Rate 9.0%",
+            "ATK 8.6%",
+        ]);
+        let img = RgbaImage::new(1920, 1080);
+        let scanned = scan_echo(&engine, &img, &EchoDetailLayout::default_16_9()).unwrap();
+
+        assert_eq!(scanned.set, Some(EchoSet::SunSinkingEclipse));
+        assert_eq!(scanned.cost, Some(4));
+        assert!(scanned.main_stat.is_some());
+
+        let echo = scanned.into_echo(1).expect("should be complete");
+        assert_eq!(echo.id, 1);
+        assert_eq!(echo.set, EchoSet::SunSinkingEclipse);
+        assert_eq!(echo.cost, 4);
+    }
+
+    #[test]
+    fn into_echo_reports_missing_fields() {
+        let scanned = ScannedEcho {
+            name: "Test".into(),
+            cost: None,
+            set: None,
+            main_stat: Some(StatRoll::new(Stat::AtkPct, 30.0)),
+            substats: vec![],
+        };
+        // AtkPct main is ambiguous on cost, and no set was read → missing set
+        // (cost inference is attempted first, but set is still absent).
+        assert!(scanned.into_echo(1).is_err());
     }
 }

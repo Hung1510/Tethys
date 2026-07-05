@@ -119,6 +119,7 @@ pub struct EchoDetailLayout {
     pub cost: NormRect,
     pub main_stat: NormRect,
     pub substats: NormRect,
+    pub set: NormRect,
 }
 
 impl EchoDetailLayout {
@@ -129,7 +130,8 @@ impl EchoDetailLayout {
             name: NormRect::new(0.660, 0.085, 0.300, 0.060),
             cost: NormRect::new(0.905, 0.090, 0.060, 0.050),
             main_stat: NormRect::new(0.660, 0.300, 0.300, 0.060),
-            substats: NormRect::new(0.660, 0.545, 0.310, 0.340),
+            substats: NormRect::new(0.660, 0.545, 0.310, 0.300),
+            set: NormRect::new(0.660, 0.885, 0.310, 0.055),
         }
     }
 
@@ -140,6 +142,7 @@ impl EchoDetailLayout {
             cost: self.cost.to_pixels(content),
             main_stat: self.main_stat.to_pixels(content),
             substats: self.substats.to_pixels(content),
+            set: self.set.to_pixels(content),
         }
     }
 }
@@ -151,16 +154,18 @@ pub struct ResolvedRegions {
     pub cost: PixelRect,
     pub main_stat: PixelRect,
     pub substats: PixelRect,
+    pub set: PixelRect,
 }
 
 impl ResolvedRegions {
     /// The regions paired with human-readable labels, for overlays and logs.
-    pub fn labeled(&self) -> [(&'static str, PixelRect); 4] {
+    pub fn labeled(&self) -> [(&'static str, PixelRect); 5] {
         [
             ("name", self.name),
             ("cost", self.cost),
             ("main_stat", self.main_stat),
             ("substats", self.substats),
+            ("set", self.set),
         ]
     }
 }
@@ -176,11 +181,12 @@ pub fn crop(img: &RgbaImage, rect: PixelRect) -> RgbaImage {
 }
 
 /// Distinct colors used to outline regions in the calibration overlay.
-const OVERLAY_COLORS: [[u8; 4]; 4] = [
-    [255, 64, 64, 255],  // name    — red
-    [255, 214, 64, 255], // cost    — amber
-    [64, 220, 120, 255], // main    — green
-    [64, 200, 255, 255], // substats — cyan
+const OVERLAY_COLORS: [[u8; 4]; 5] = [
+    [255, 64, 64, 255],   // name    — red
+    [255, 214, 64, 255],  // cost    — amber
+    [64, 220, 120, 255],  // main    — green
+    [64, 200, 255, 255],  // substats — cyan
+    [200, 120, 255, 255], // set     — purple
 ];
 
 /// Return a copy of `img` with each region drawn as a colored rectangle. Used

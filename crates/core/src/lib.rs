@@ -18,7 +18,9 @@ pub mod prelude {
     pub use crate::optimizer::{
         optimize_exhaustive, optimize_ga, BuildSpec, GaConfig, OptimizeError, OptimizeResult,
     };
-    pub use crate::parse::{parse_lines, parse_substat_line};
+    pub use crate::parse::{
+        infer_cost_from_main, parse_cost, parse_lines, parse_set_name, parse_substat_line,
+    };
     pub use crate::score::{CharacterProfile, Evaluator, WeightedSubstatEvaluator};
 }
 
@@ -78,6 +80,43 @@ mod tests {
         let stats = parse_lines(block);
         assert_eq!(stats.len(), 3);
         assert_eq!(stats[0].stat, Stat::CritRate);
+    }
+
+    #[test]
+    fn parses_cost_only_from_valid_values() {
+        assert_eq!(parse_cost("COST 4"), Some(4));
+        assert_eq!(parse_cost("3"), Some(3));
+        assert_eq!(parse_cost("Cost: 1"), Some(1));
+        // A 44.0% main stat leaking into the region must not read as a cost.
+        assert_eq!(parse_cost("Crit. DMG 44.0%"), None);
+        assert_eq!(parse_cost("no digits here"), None);
+    }
+
+    #[test]
+    fn infers_cost_from_unambiguous_mains() {
+        assert_eq!(infer_cost_from_main(Stat::CritDmg), Some(4));
+        assert_eq!(infer_cost_from_main(Stat::Fusion), Some(3));
+        assert_eq!(infer_cost_from_main(Stat::EnergyRegen), Some(3));
+        assert_eq!(infer_cost_from_main(Stat::Atk), Some(1));
+        // Percentage mains appear at several costs — ambiguous.
+        assert_eq!(infer_cost_from_main(Stat::AtkPct), None);
+    }
+
+    #[test]
+    fn parses_set_names_from_noisy_ocr() {
+        assert_eq!(
+            parse_set_name("Sun-sinking Eclipse"),
+            Some(EchoSet::SunSinkingEclipse)
+        );
+        assert_eq!(
+            parse_set_name("MOLTEN RIFT"),
+            Some(EchoSet::MoltenRiftEmbers)
+        );
+        assert_eq!(
+            parse_set_name("2-Set: Lingering Tunes"),
+            Some(EchoSet::LingeringTunes)
+        );
+        assert_eq!(parse_set_name("unrelated text"), None);
     }
 
     // --- test fixtures ------------------------------------------------------

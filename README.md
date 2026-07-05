@@ -92,7 +92,7 @@ cargo run -p tethys-app --features gui -- gui
 cargo build -p tethys-scanner --features tesseract
 ```
 
-`scan` captures the game window, locates the echo detail panel, and reads its stats with the OS's built-in `Windows.Media.Ocr` engine — no Tesseract or other install required. If it reports no stats, run `calibrate` and nudge the regions.
+`scan` captures the game window, locates the echo detail panel, and reads a complete echo — set, cost, main stat, and substats — with the OS's built-in `Windows.Media.Ocr` engine (no Tesseract or other install). Each scan appends the echo to an inventory file (default `inventory.json`), so the workflow is: select an echo in-game → `tethys scan` → repeat → `tethys optimize inventory.json`. If a field can't be read, `scan` says which and points you to `calibrate` to align the regions.
 
 > On Windows the game runs elevated, so Tethys must run elevated for capture to see its window. Set Windows display scaling to 100% for the scan regions to line up (the scanner works in physical pixels). Windows OCR uses the English language feature — installed by default on most systems; if `scan` reports no OCR engine, add it under Settings → Time & language → Language → English → Optional features.
 
@@ -107,7 +107,7 @@ To line the regions up with the live UI there's a calibration overlay:
 cargo run -p tethys-app --features capture -- calibrate cal.png
 ```
 
-`cal.png` is your screenshot with colored boxes drawn where Tethys thinks each field is — red = name, amber = cost, green = main stat, cyan = substats. If a box is off, nudge the fractions in `EchoDetailLayout::default_16_9()` (`crates/scanner/src/layout.rs`) and re-run. Here is the overlay on a mock 1080p frame:
+`cal.png` is your screenshot with colored boxes drawn where Tethys thinks each field is — red = name, amber = cost, green = main stat, cyan = substats, purple = set. If a box is off, nudge the fractions in `EchoDetailLayout::default_16_9()` (`crates/scanner/src/layout.rs`) and re-run. Here is the overlay on a mock 1080p frame:
 
 <p align="center"><img src="assets/calibration-demo.png" alt="calibration overlay" width="640"></p>
 

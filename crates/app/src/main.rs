@@ -37,7 +37,7 @@ fn run() -> Result<()> {
         }
         Some("optimize") => cmd_optimize(&args[1..]),
         Some("calibrate") => cmd_calibrate(&args[1..]),
-        Some("scan") => cmd_scan(),
+        Some("scan") => cmd_scan(&args[1..]),
         Some("windows") => cmd_list_windows(),
         Some("--gui") | Some("gui") => launch_gui(),
         _ => {
@@ -47,28 +47,59 @@ fn run() -> Result<()> {
     }
 }
 
-fn cmd_scan() -> Result<()> {
+fn cmd_scan(args: &[String]) -> Result<()> {
     #[cfg(all(feature = "capture", feature = "windows-ocr"))]
     {
+        use std::path::Path;
+        let path = args
+            .iter()
+            .find(|a| !a.starts_with("--"))
+            .cloned()
+            .unwrap_or_else(|| "inventory.json".to_string());
+
         let engine = tethys_scanner::ocr::WindowsOcr::new()
             .with_context(|| "starting the Windows OCR engine")?;
         let image = tethys_scanner::capture::capture_window_image()?;
-        let stats = tethys_scanner::scan_echo_panel(
+        let scanned = tethys_scanner::scan_echo(
             &engine,
             &image,
             &tethys_scanner::EchoDetailLayout::default_16_9(),
         )?;
 
-        if stats.is_empty() {
-            println!(
-                "Read no stats. Open an echo's detail panel in-game, then check the \
-                 regions line up with `tethys calibrate cal.png`."
-            );
+        // Load the existing inventory, or start a new one.
+        let mut inv: Inventory = if Path::new(&path).exists() {
+            serde_json::from_str(&std::fs::read_to_string(&path)?)
+                .with_context(|| format!("parsing {path}"))?
         } else {
-            println!("Read {} stat(s) from the open echo panel:", stats.len());
-            for s in &stats {
-                let pct = if s.stat.is_percent() { "%" } else { "" };
-                println!("  {:?}  {:.1}{pct}", s.stat, s.value);
+            Inventory::default()
+        };
+        let next_id = inv.echoes.iter().map(|e| e.id).max().unwrap_or(0) + 1;
+
+        match scanned.clone().into_echo(next_id) {
+            Ok(echo) => {
+                println!("Scanned echo #{next_id}:");
+                println!("  {}", describe_echo(&echo));
+                inv.echoes.push(echo);
+                std::fs::write(&path, serde_json::to_string_pretty(&inv)?)?;
+                println!(
+                    "Saved to {path} — {} echo(es) total. Select the next echo and \
+                     scan again, or run `tethys optimize {path}` when done.",
+                    inv.len()
+                );
+            }
+            Err(missing) => {
+                eprintln!("Incomplete scan — could not read the {missing}.");
+                eprintln!(
+                    "  read so far: set={:?}, cost={:?}, main={:?}, {} substat(s)",
+                    scanned.set,
+                    scanned.cost,
+                    scanned.main_stat.map(|m| m.stat),
+                    scanned.substats.len()
+                );
+                eprintln!(
+                    "Open the echo's detail panel and run `tethys calibrate cal.png` \
+                     to align the regions, then re-scan."
+                );
             }
         }
         return Ok(());
@@ -76,6 +107,7 @@ fn cmd_scan() -> Result<()> {
 
     #[cfg(not(all(feature = "capture", feature = "windows-ocr")))]
     {
+        let _ = args;
         anyhow::bail!(
             "scan needs the `capture` and `windows-ocr` features; \
              build with --features capture,windows-ocr"
@@ -296,7 +328,7 @@ fn print_usage() {
          \x20 tethys sample                       print a sample inventory (JSON schema)\n\
          \x20 tethys optimize <inv.json> [flags]  optimize a build\n\
          \x20 tethys calibrate [out.png] [--grid]  save a capture-region overlay (needs `capture`)\n\
-         \x20 tethys scan                          read the open echo panel (needs `capture,windows-ocr`)\n\
+         \x20 tethys scan [inv.json]              add the open echo to an inventory (needs `capture,windows-ocr`)\n\
          \x20 tethys windows                        list window titles for scan setup (needs `capture`)\n\n\
          OPTIMIZE FLAGS:\n\
          \x20 --profile <dps|support>   weighting to optimize for (default: dps)\n\
