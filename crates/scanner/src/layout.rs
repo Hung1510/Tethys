@@ -97,12 +97,15 @@ pub fn fit_16_9(width: u32, height: u32) -> PixelRect {
     let aspect = w / h;
 
     if aspect > TARGET_ASPECT {
-        // Pillarbox: constrain width to the full height.
+        // Ultrawide (wider than 16:9). Wuthering Waves left-anchors its UI here
+        // — the left menu and echo grid sit at the true left edge and the world
+        // art fills the extra width on the right — so anchor the 16:9 UI box to
+        // the left edge (x = 0) rather than centering it. (Verified against a
+        // 3440x1440 capture.)
         let content_w = (h * TARGET_ASPECT).round();
-        let x = ((w - content_w) / 2.0).round();
-        PixelRect::new(x as u32, 0, content_w as u32, height)
+        PixelRect::new(0, 0, content_w as u32, height)
     } else {
-        // Letterbox (or exact): constrain height to the full width.
+        // Letterbox (or exact): bars top/bottom, UI centered vertically.
         let content_h = (w / TARGET_ASPECT).round();
         let y = ((h - content_h) / 2.0).round();
         PixelRect::new(0, y as u32, width, content_h as u32)
@@ -123,15 +126,18 @@ pub struct EchoDetailLayout {
 }
 
 impl EchoDetailLayout {
-    /// Calibration starting points for the 16:9 layout. Verify against a real
-    /// screenshot with the [`crate::calibrate`] overlay and tune as needed.
+    /// Calibration starting points for the 16:9 layout, retuned against a real
+    /// 3440x1440 capture. Name, cost, and set are measured; main-stat and
+    /// substats are estimates pending a leveled-echo frame (an unleveled echo
+    /// shows a skill description there instead). Verify with the
+    /// [`crate::calibrate`] overlay and tune as needed.
     pub fn default_16_9() -> Self {
         Self {
-            name: NormRect::new(0.660, 0.085, 0.300, 0.060),
-            cost: NormRect::new(0.905, 0.090, 0.060, 0.050),
-            main_stat: NormRect::new(0.660, 0.300, 0.300, 0.060),
-            substats: NormRect::new(0.660, 0.545, 0.310, 0.300),
-            set: NormRect::new(0.660, 0.885, 0.310, 0.055),
+            name: NormRect::new(0.680, 0.075, 0.220, 0.055),
+            cost: NormRect::new(0.760, 0.160, 0.110, 0.050),
+            main_stat: NormRect::new(0.760, 0.275, 0.230, 0.055),
+            substats: NormRect::new(0.760, 0.350, 0.235, 0.150),
+            set: NormRect::new(0.760, 0.490, 0.230, 0.055),
         }
     }
 
@@ -351,10 +357,13 @@ mod tests {
     }
 
     #[test]
-    fn fit_ultrawide_pillarboxes() {
-        // 21:9-ish monitor: bars left and right, 16:9 content centered.
+    fn fit_ultrawide_left_anchors() {
+        // 21:9-ish monitor: WuWa left-anchors its UI, so the 16:9 content box
+        // sits flush against the left edge (x = 0), art fills the right.
         let c = fit_16_9(2560, 1080);
-        assert_eq!(c, PixelRect::new(320, 0, 1920, 1080));
+        assert_eq!(c, PixelRect::new(0, 0, 1920, 1080));
+        // And the real ultrawide case we measured:
+        assert_eq!(fit_16_9(3440, 1440), PixelRect::new(0, 0, 2560, 1440));
     }
 
     #[test]
@@ -366,12 +375,12 @@ mod tests {
 
     #[test]
     fn norm_rect_offsets_into_content() {
-        // A region at the content origin must be offset by a pillarboxed
-        // content's x, not sit at the image's left edge.
-        let content = fit_16_9(2560, 1080); // x = 320
+        // A region at the content origin must be offset by a letterboxed
+        // content's y, not sit at the image's top edge.
+        let content = fit_16_9(1920, 1200); // 16:10 → y = 60
         let r = NormRect::new(0.0, 0.0, 0.5, 0.5).to_pixels(content);
-        assert_eq!(r.x, 320);
-        assert_eq!(r.y, 0);
+        assert_eq!(r.x, 0);
+        assert_eq!(r.y, 60);
         assert_eq!(r.width, 960);
         assert_eq!(r.height, 540);
     }
